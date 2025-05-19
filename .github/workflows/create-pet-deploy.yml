@@ -59,7 +59,7 @@ jobs:
           # Run new container with environment variables
           sudo docker run -d \
             --name create-pet \
-            -p 8001:3001 \
+            -p 3001:3001 \
             --restart unless-stopped \
             ${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest
 
