@@ -58,14 +58,15 @@ jobs:
           
           # Run new container with environment variables
           sudo docker run -d \
-            --name create-pet \
-            -p 3001:3001 \
-            --restart unless-stopped \
-            -e DB_NAME=${{ secrets.DB_NAME }} \
-            -e DB_USER=${{ secrets.DB_USER }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -e DB_HOST=${{ secrets.DB_HOST }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest
+           --name create-pet \
+           -p 3001:3001 \
+           --restart unless-stopped \
+          -e DB_NAME=${{ secrets.DB_NAME }} \
+          -e DB_USER=${{ secrets.DB_USER }} \
+          -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          -e DB_HOST=${{ secrets.DB_HOST }} \
+          ${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest
+
 
           # Verify container is running
           sudo docker ps | grep create-pet
