@@ -65,7 +65,7 @@ jobs:
           -e DB_USER=${{ secrets.DB_USER }} \
           -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
           -e DB_HOST=${{ secrets.DB_HOST }} \
-          ${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest
+          "${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest"
 
 
           # Verify container is running
