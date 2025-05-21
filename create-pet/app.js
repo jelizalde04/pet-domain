@@ -29,5 +29,5 @@ app.listen(PORT, async () => {
   }
 
   console.log(`Server running on port ${PORT}`);
-  console.log(`Documentación API disponible en http://localhost:${PORT}/api-docs-create`);
+  console.log(`Documentación API disponible en /api-docs-create-pet`);
 });

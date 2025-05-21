@@ -10,11 +10,7 @@ const swaggerOptions = {
       
     },
     
-    servers: [
-      {
-        url: "http://localhost:3002/api",
-      }
-    ],
+    
     tags: [
       {
         name: "Pets",
@@ -30,7 +26,7 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 const setupSwagger = (app) => {
-  app.use("/api-docs-create", swaggerUi.serve, swaggerUi.setup(swaggerDocs)); 
+  app.use("/api-docs-create-pet", swaggerUi.serve, swaggerUi.setup(swaggerDocs)); 
 };
 
 module.exports = setupSwagger;
