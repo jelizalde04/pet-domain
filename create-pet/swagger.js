@@ -3,30 +3,30 @@ const swaggerUi = require("swagger-ui-express");
 
 const swaggerOptions = {
   swaggerDefinition: {
+    openapi: "3.0.0",
     info: {
       title: "Pet Profile API",
       version: "1.0.0",
       description: "API para el manejo de perfiles de mascotas",
-      
     },
-    
-    
-    tags: [
-      {
-        name: "Pets",
-        description: "Operaciones relacionadas con los perfiles de mascotas",
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
       },
-    ],
-    produces: ["application/json"],
+    },
+    security: [{ bearerAuth: [] }],
   },
-  // Especificamos las rutas que contienen los comentarios Swagger
-  apis: ["./routes/petRoutes.js"], // Asegúrate de que la ruta esté correctamente especificada
+  apis: ["./routes/petRoutes.js"],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 const setupSwagger = (app) => {
-  app.use("/api-docs-create-pet", swaggerUi.serve, swaggerUi.setup(swaggerDocs)); 
+  app.use("/api-docs-create-pet", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 };
 
 module.exports = setupSwagger;

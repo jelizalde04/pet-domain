@@ -1,9 +1,11 @@
 const express = require("express");
+const cors = require("cors");
 const sequelize = require("./config/db");
 const setupSwagger = require("./swagger");
 const petRoutes = require("./routes/petRoutes");
 
 const app = express();
+app.use(cors());
 app.use(express.json()); // Para manejar JSON
 
 // Configura Swagger
@@ -29,5 +31,5 @@ app.listen(PORT, async () => {
   }
 
   console.log(`Server running on port ${PORT}`);
-  console.log(`Documentación API disponible en /api-docs-create-pet`);
+
 });
