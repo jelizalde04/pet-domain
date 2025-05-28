@@ -65,8 +65,8 @@ jobs:
           -e DB_USER=${{ secrets.DB_USER }} \
           -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
           -e DB_HOST=${{ secrets.DB_HOST }} \
+          -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
           "${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest"
-
 
           # Verify container is running
           sudo docker ps | grep create-pet
