@@ -26,7 +26,7 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 const setupSwagger = (app) => {
-  app.use("/api-docs-create-pet", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+  app.use("/api-docs-createPet", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 };
 
 module.exports = setupSwagger;
