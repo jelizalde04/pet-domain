@@ -59,14 +59,14 @@ jobs:
           # Run new container with environment variables
           sudo docker run -d \
            --name get-all-pets \
-           -p 3001:3001 \
+           -p 3004:3004 \
            --restart unless-stopped \
           -e DB_NAME=${{ secrets.DB_NAME }} \
           -e DB_USER=${{ secrets.DB_USER }} \
           -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
           -e DB_HOST=${{ secrets.DB_HOST }} \
           -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-          "${{ secrets.DOCKERHUB_USERNAME }}get-all-pets:latest"
+          "${{ secrets.DOCKERHUB_USERNAME }}/get-all-pets:latest"
 
           # Verify container is running
           sudo docker ps | grep get-all-pets
