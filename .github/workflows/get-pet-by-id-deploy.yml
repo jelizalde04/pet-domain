@@ -1,4 +1,4 @@
-name: Create Pet Deploy
+name: Get Pet By Id Pet Deploy
 on:
   push:
     branches: [test]
@@ -27,10 +27,13 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/get-pet-by-id:latest
           build-args: |
-            DB_NAME=${{ secrets.DB_NAME }}
+            DB_HOST=${{ secrets.DB_HOST }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}
 
   deploy-to-ec2:
     needs: build-and-push
@@ -61,12 +64,14 @@ jobs:
            --name get-pet-by-id \
            -p 3003:3003 \
            --restart unless-stopped \
-          -e DB_NAME=${{ secrets.DB_NAME }} \
-          -e DB_USER=${{ secrets.DB_USER }} \
-          -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-          -e DB_HOST=${{ secrets.DB_HOST }} \
-          -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-          "${{ secrets.DOCKERHUB_USERNAME }}/get-pet-by-id:latest"
+           -e DB_HOST=${{ secrets.DB_HOST }} \
+           -e DB_USER=${{ secrets.DB_USER }} \
+           -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+           -e DB_PORT=${{ secrets.DB_PORT }} \
+           -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+           -e PET_DB_NAME=${{ secrets.PET_DB_NAME }} \
+           -e RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }} \
+           "${{ secrets.DOCKERHUB_USERNAME }}/get-pet-by-id:latest"
 
           # Verify container is running
           sudo docker ps | grep get-pet-by-id
