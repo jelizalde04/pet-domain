@@ -1,21 +1,42 @@
 const { Sequelize } = require("sequelize");
+require("dotenv").config(); // Load environment variables
 
-// Carga las variables de entorno
-require("dotenv").config();
-
-const sequelize = new Sequelize({
-  host: process.env.DB_HOST, // DB Host
-  username: process.env.DB_USER, // DB User
-  password: process.env.DB_PASSWORD, // DB Password
-  database: process.env.DB_NAME, // DB Name
-  dialect: "postgres", // Usamos PostgreSQL
-  port: process.env.DB_PORT, // Puerto de la base de datos
-dialectOptions: {
+/**
+ * Sequelize instance for the RESPONSIBLE database connection.
+ * Configured to connect to a PostgreSQL DB with SSL.
+ */
+const responsibleDb = new Sequelize({
+  host: process.env.DB_HOST,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.RESPONSIBLE_DB_NAME,
+  dialect: "postgres",
+  port: process.env.DB_PORT,
+  dialectOptions: {
     ssl: {
-      require: true, 
-      rejectUnauthorized: false 
-    }
-  }
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
 });
 
-module.exports = sequelize;
+/**
+ * Sequelize instance for the PET database connection.
+ * Configured to connect to a PostgreSQL DB with SSL.
+ */
+const petDb = new Sequelize({
+  host: process.env.DB_HOST,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.PET_DB_NAME,
+  dialect: "postgres",
+  port: process.env.DB_PORT,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+});
+
+module.exports = { responsibleDb, petDb };

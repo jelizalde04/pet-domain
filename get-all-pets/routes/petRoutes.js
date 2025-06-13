@@ -5,15 +5,15 @@ const authenticateToken = require("../middlewares/auth");
 
 /**
  * @swagger
- * /api/pets:
+ * /pets:
  *   get:
- *     summary: Obtener todas las mascotas del usuario autenticado
+ *     summary: Obtener todas las mascotas del usuario autenticado, incluyendo información del responsable
  *     tags: [Pets]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Lista de mascotas del usuario
+ *         description: Lista de mascotas del usuario con la información del responsable
  *         content:
  *           application/json:
  *             schema:
@@ -43,11 +43,29 @@ const authenticateToken = require("../middlewares/auth");
  *                   responsibleId:
  *                     type: string
  *                     description: ID del responsable
+ *                   responsible:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: ID del responsable
+ *                       name:
+ *                         type: string
+ *                         description: Nombre del responsable
+ *                       email:
+ *                         type: string
+ *                         description: Correo electrónico del responsable
+ *                       contact:
+ *                         type: string
+ *                         description: Número de contacto del responsable
+ *                       avatar:
+ *                         type: string
+ *                         description: URL del avatar del responsable
  *       404:
  *         description: No se encontraron mascotas
  *       500:
  *         description: Error interno del servidor
  */
-router.get("/pets", authenticateToken, getAllPets);
+router.get("/", authenticateToken, getAllPets);
 
 module.exports = router;

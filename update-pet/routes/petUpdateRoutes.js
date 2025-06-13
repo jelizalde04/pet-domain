@@ -5,7 +5,7 @@ const authenticateToken = require("../middlewares/auth");
 
 /**
  * @swagger
- * /api/pets/{id}:
+ * /pets/{id}:
  *   patch:
  *     summary: Actualizar información de una mascota
  *     tags: [Pets]
@@ -49,6 +49,6 @@ const authenticateToken = require("../middlewares/auth");
  *       404:
  *         description: Mascota no encontrada
  */
-router.patch("/pets/:id", authenticateToken, updatePet);
+router.patch("/:id", authenticateToken, updatePet);
 
 module.exports = router;

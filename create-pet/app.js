@@ -6,30 +6,30 @@ const petRoutes = require("./routes/petRoutes");
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // Para manejar JSON
+app.use(express.json());
 
-// Configura Swagger
 setupSwagger(app);
 
-// Rutas de la API
-app.use("/api", petRoutes); // Asegúrate de que las rutas estén en '/api'
+app.use("/pets", petRoutes);
 
-// Conexión a la base de datos y sincronización
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, async () => {
+async function startServer() {
   try {
-    // Verifica la conexión a la base de datos
     await sequelize.authenticate();
-    console.log("Database connected.");
+    console.log("✅ Conexión a la base de datos establecida.");
 
-    // Sincroniza la base de datos con los modelos
     await sequelize.sync();
-    console.log("Database synchronized with models.");
+    console.log("✅ Base de datos sincronizada con los modelos.");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
+    });
+
   } catch (err) {
-    console.error("Error connecting to the database or syncing models:", err);
+    console.error("❌ Error al conectar o sincronizar la base de datos:", err.message);
+    process.exit(1);
   }
+}
 
-  console.log(`Server running on port ${PORT}`);
-
-});
+startServer();

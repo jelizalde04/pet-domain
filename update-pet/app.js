@@ -6,33 +6,31 @@ const petUpdateRoutes = require("./routes/petUpdateRoutes");
 
 const app = express();
 app.use(cors());
-// Middlewares
+
 app.use(express.json());
 
-// Configurar Swagger
 setupSwagger(app);
 
-// Rutas de la API
-app.use("/api", petUpdateRoutes);  // Usamos "/api" como prefijo de las rutas
+app.use("/pets", petUpdateRoutes);
 
-// Conexión a la base de datos
-sequelize.authenticate()
-  .then(() => {
-    console.log("Conexión a la base de datos establecida correctamente");
-    return sequelize.sync();
-  })
-  .then(() => {
-    console.log("Modelos sincronizados con la base de datos");
+const PORT = process.env.PORT || 3002;
 
-    // Inicio del servidor
-    const PORT = process.env.PORT || 3002;
+async function startServer() {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Base de datos de mascotas conectada.");
+
+    await sequelize.sync();
+    console.log("✅ Base de datos sincronizada con los modelos.");
+
     app.listen(PORT, () => {
-      console.log(`Servicio de actualización de mascotas corriendo en puerto ${PORT}`);
+      console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
     });
-  })
-  .catch(error => {
-    console.error("Error al iniciar el servicio:", error);
-    process.exit(1);
-  });
 
-module.exports = app;
+  } catch (err) {
+    console.error("❌ Error al conectar o sincronizar la base de datos:", err.message);
+    process.exit(1);
+  }
+}
+
+startServer();

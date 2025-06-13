@@ -7,67 +7,95 @@ const options = {
     info: {
       title: "Pet Get Service API",
       version: "1.0.0",
-      description: "API para obtener información de mascotas por ID",
+      description: "API to get pet information by ID",
     },
     components: {
       securitySchemes: {
         bearerAuth: {
           type: "http",
           scheme: "bearer",
-          bearerFormat: "JWT",
+          bearerFormat: "JWT", // Use JWT tokens for authentication
         },
       },
       schemas: {
-        Pet: {
+        Pet: {  // Pet schema definition
           type: "object",
           properties: {
             id: {
               type: "string",
-              example: "123",
+              description: "Unique identifier of the pet",
             },
             name: {
               type: "string",
-              example: "Fido",
+              description: "Name of the pet",
             },
             species: {
               type: "string",
-              example: "Dog",
+              description: "Species of the pet",
             },
-            age: {
-              type: "integer",
-              example: 5,
+            breed: {
+              type: "string",
+              description: "Breed of the pet",
+            },
+            image: {
+              type: "string",
+              description: "Image URL of the pet",
+            },
+            birthdate: {
+              type: "string",
+              format: "date",
+              description: "Birthdate of the pet",
+            },
+            residence: {
+              type: "string",
+              description: "Residence of the pet",
+            },
+            gender: {
+              type: "string",
+              description: "Gender of the pet",
+            },
+            color: {
+              type: "string",
+              description: "Color of the pet",
             },
             responsibleId: {
               type: "string",
-              example: "user123",
+              description: "ID of the person responsible for the pet",
             },
           },
-          required: ["id", "name", "species"],
         },
-        Error: {
+        Error: {  // Error response schema definition
           type: "object",
           properties: {
             message: {
               type: "string",
-              example: "Mascota no encontrada.",
+              description: "Error message",
             },
-            status: {
-              type: "integer",
-              example: 404,
+            details: {
+              type: "string",
+              description: "Additional error details (optional)",
             },
           },
-          required: ["message", "status"],
         },
       },
     },
+    // Apply security globally to all routes that require authentication
     security: [{ bearerAuth: [] }],
   },
-  apis: ["./routes/*.js"],
+  // Specify the files where Swagger will look for documentation comments
+  apis: ["./routes/petGetRoutes.js"],
 };
-const specs = swaggerJsdoc(options);
 
+const swaggerDocs = swaggerJsdoc(options);
+
+/**
+ * Setup Swagger UI middleware on the given Express app.
+ * Exposes API documentation at '/api-docs-getPetId'.
+ * 
+ * @param {import('express').Express} app - Express application instance
+ */
 const setupSwagger = (app) => {
-  app.use("/api-docs-getPetId", swaggerUi.serve, swaggerUi.setup(specs,));
+  app.use("/api-docs-getPetId", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 };
 
 module.exports = setupSwagger;

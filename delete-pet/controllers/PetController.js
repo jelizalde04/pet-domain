@@ -3,7 +3,7 @@ const { deletePetById } = require("../services/PetService");
 const deletePet = async (req, res) => {
   try {
     const petId = req.params.id;
-    const authenticatedUserId = req.user?.id; // Si usas autenticación
+    const authenticatedUserId = req.user?.id; 
 
     await deletePetById(petId, authenticatedUserId);
 

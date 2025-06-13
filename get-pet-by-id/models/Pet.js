@@ -1,11 +1,10 @@
-const { Sequelize, DataTypes } = require("sequelize");
-const { v4: uuidv4 } = require("uuid");
-const sequelize = require("../config/db");
+const { petDb } = require("../config/db");
+const { DataTypes } = require("sequelize");
 
-const Pet = sequelize.define("Pet", {
+const Pet = petDb.define("Pet", {
   id: {
     type: DataTypes.UUID,
-    defaultValue: uuidv4,
+    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
   name: {
@@ -34,17 +33,10 @@ const Pet = sequelize.define("Pet", {
   color: {
     type: DataTypes.STRING,
   },
-  responsibleId: {  
+  responsibleId: {
     type: DataTypes.UUID,
-    allowNull: false,
-    references: {
-      model: "Responsibles",  
-      key: "id",
-    },
+    allowNull: false,  
   },
 });
-
-// Relación uno a muchos sin necesidad de importar el modelo Responsible
-Pet.belongsTo(Pet, { foreignKey: "responsibleId" }); // Relación entre pet y responsibleId
 
 module.exports = Pet;

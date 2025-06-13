@@ -1,34 +1,45 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("./config/db"); 
+const sequelize = require("./config/db");
 const setupSwagger = require("./swagger");
 const petRoutes = require("./routes/petRoutes");
 
 const app = express();
+
 app.use(cors());
-// Middleware
-app.use(express.json());  // Para manejar JSON en las solicitudes
+app.use(express.json()); // Middleware to parse incoming JSON requests
 
-// Swagger Documentation
-setupSwagger(app);  // Configura Swagger con la documentación de la API
+/**
+ * Initialize Swagger API documentation
+ * @param {Express.Application} app - The Express application instance
+ */
+setupSwagger(app);
 
-// Rutas de la API
-app.use("/api", petRoutes);  // Carga las rutas de las mascotas (que incluyen la ruta DELETE)
+// API routes for pets
+app.use("/pets", petRoutes);
 
+const PORT = process.env.PORT || 3005;
 
-sequelize.authenticate()
-  .then(() => {
-    console.log("Conexión a la base de datos establecida correctamente");
+/**
+ * Start the Express server only after successful database connection and synchronization.
+ * Logs success or failure messages in Spanish.
+ */
+async function startServer() {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Base de datos conectada.");
 
-    const PORT = process.env.PORT || 3005;  
+    await sequelize.sync();
+    console.log("✅ Base de datos sincronizada con los modelos.");
+
     app.listen(PORT, () => {
-      console.log(`Servicio de consulta de mascotas corriendo en puerto ${PORT}`);
-      console.log(`Documentación API: http://localhost:${PORT}/api-docs`);
+      console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
     });
-  })
-  .catch((error) => {
-    console.error("Error al conectar con la base de datos:", error);
-    process.exit(1);  // Si no se puede conectar a la base de datos, termina la ejecución
-  });
 
-module.exports = app;
+  } catch (err) {
+    console.error("❌ Error conectando o sincronizando la base de datos:", err.message);
+    process.exit(1); // Exit process on failure
+  }
+}
+
+startServer();

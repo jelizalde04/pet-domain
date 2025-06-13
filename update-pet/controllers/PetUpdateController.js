@@ -3,8 +3,7 @@ const { updatePetProfile } = require("../services/PetService");
 const updatePet = async (req, res) => {
   try {
     const petId = req.params.id;
-    const authenticatedUserId = req.user?.id;  // Accedemos a `id` aquí, que viene del middleware
-
+    const authenticatedUserId = req.user?.id;  
     const updatedPet = await updatePetProfile(petId, req.body, authenticatedUserId);
     res.json(updatedPet);
   } catch (error) {

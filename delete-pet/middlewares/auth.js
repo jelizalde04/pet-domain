@@ -3,9 +3,18 @@ require("dotenv").config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+/**
+ * Middleware to authenticate JWT tokens sent in the Authorization header.
+ * If valid, it attaches the user ID to the request object.
+ * Otherwise, it returns appropriate HTTP error responses in Spanish.
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Next middleware function
+ */
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  const token = authHeader && authHeader.split(" ")[1]; // Extract token from "Bearer <token>"
 
   if (!token) {
     console.warn("Authorization header missing");
@@ -18,9 +27,9 @@ const authenticateToken = (req, res, next) => {
       return res.status(403).json({ error: "Token inválido o expirado." });
     }
 
-    // Aquí guardamos la propiedad userId como 'id' en req.user
+    // Attach user ID from token payload to request object for further use
     req.user = {
-      id: decoded.userId  // Aquí debe coincidir con el campo en el token JWT
+      id: decoded.userId
     };
 
     console.log("Decoded JWT payload:", decoded);

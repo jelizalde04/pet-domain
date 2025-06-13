@@ -1,33 +1,47 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("./config/db");
+const { petDb, responsibleDb } = require("./config/db");
 const setupSwagger = require("./swagger");
-const petGetRoutes = require("./routes/petGetRoutes");
+const petRoutes = require("./routes/petGetRoutes");
 
 const app = express();
 app.use(cors());
-// Middleware
-app.use(express.json());
+app.use(express.json()); // Middleware to parse JSON request bodies
 
-// Swagger Documentation
+// Setup Swagger for API documentation
 setupSwagger(app);
 
-// Routes
-app.use("/api", petGetRoutes);
+// API routes for pets and their responsible users
+app.use("/pets", petRoutes);
 
-// Database Connection and Server Startup
-sequelize.authenticate()
-  .then(() => {
-    console.log("Conexión a la base de datos establecida correctamente");
+const PORT = process.env.PORT || 3003;
 
-    const PORT = process.env.PORT || 3003;
+async function startServer() {
+  try {
+    // Authenticate connection to pets database
+    await petDb.authenticate();
+    console.log("Pet Database connected.");
+
+    // Authenticate connection to responsible users database
+    await responsibleDb.authenticate();
+    console.log("Responsible Database connected.");
+
+    // Synchronize pet models with the database
+    await petDb.sync();
+    console.log("Pet Database synchronized with models.");
+
+    // Start the server and listen on the specified port
     app.listen(PORT, () => {
-      console.log(`Servicio de consulta de mascotas corriendo en puerto ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
-  })
-  .catch(error => {
-    console.error("Error al conectar con la base de datos:", error);
-    process.exit(1);
-  });
 
-module.exports = app;
+  } catch (err) {
+    // Log errors and exit process if database connections or sync fail
+    console.error("Error connecting to the databases or syncing models:");
+    console.error(err);
+    process.exit(1);
+  }
+}
+
+// Call function to start the server
+startServer();

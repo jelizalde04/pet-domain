@@ -1,5 +1,13 @@
 const Pet = require("../models/Pet");
 
+/**
+ * Creates a new pet profile associated with the authenticated user.
+ *
+ * @param {Object} petData - Data of the pet to be created.
+ * @param {string} authenticatedUserId - ID of the authenticated user.
+ * @returns {Promise<Object>} The created pet instance.
+ * @throws {Error} When required fields are missing or a pet already exists with the same name.
+ */
 const createPet = async (petData, authenticatedUserId) => {
   const { name } = petData;
 
@@ -33,7 +41,7 @@ const createPet = async (petData, authenticatedUserId) => {
   };
 
   const pet = await Pet.create(petToCreate);
-  console.log(`Pet created successfully: ${pet.id}`);
+  console.log(`Mascota creada correctamente: ${pet.id}`);
   return pet;
 };
 

@@ -20,14 +20,14 @@ const swaggerOptions = {
       },
     security: [{ bearerAuth: [] }],
     },
-  // Especificamos las rutas que contienen los comentarios Swagger
-  apis: ["./routes/petRoutes.js"], // Apunta a los archivos de rutas y controladores donde están los comentarios Swagger
+  
+  apis: ["./routes/petRoutes.js"], 
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 const setupSwagger = (app) => {
-  app.use("/api-docs-allPets", swaggerUi.serve, swaggerUi.setup(swaggerDocs)); // Configura la documentación en '/api-docs'
+  app.use("/api-docs-getAllPets", swaggerUi.serve, swaggerUi.setup(swaggerDocs)); 
 };
 
 module.exports = setupSwagger;

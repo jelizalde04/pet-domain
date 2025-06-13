@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { getPetById } = require("../controllers/PetGetController");
-const authenticateToken = require("../middlewares/auth"); // si quieres controlar acceso
+const authenticateToken = require("../middlewares/auth"); 
 
 /**
  * @swagger
@@ -12,12 +12,12 @@ const authenticateToken = require("../middlewares/auth"); // si quieres controla
 
 /**
  * @swagger
- * /api/pets/{id}:
+ * /pets/{id}:
  *   get:
  *     summary: Obtiene una mascota por su ID
  *     tags: [Consulta de Mascotas]
  *     security:
- *       - bearerAuth: []    # si quieres que sea privado
+ *       - bearerAuth: []    
  *     parameters:
  *       - in: path
  *         name: id
@@ -50,11 +50,6 @@ const authenticateToken = require("../middlewares/auth"); // si quieres controla
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-
-// Si quieres proteger la ruta con autenticación:
-router.get("/pets/:id", authenticateToken, getPetById);
-
-// Si quieres que sea pública, usa solo:
-// router.get("/pets/:id", getPetById);
+router.get("/:id", authenticateToken, getPetById);
 
 module.exports = router;

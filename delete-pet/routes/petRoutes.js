@@ -12,7 +12,7 @@ const authenticateToken = require("../middlewares/auth");
 
 /**
  * @swagger
- * /api/pets/{id}:
+ * /pets/{id}:
  *   delete:
  *     summary: Elimina un perfil de mascota
  *     tags: [Pets]
@@ -41,7 +41,6 @@ const authenticateToken = require("../middlewares/auth");
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete("/pets/:id", authenticateToken, deletePet);
-// Si quieres ruta pública: router.delete("/pets/:id", deletePet);
+router.delete("/:id", authenticateToken, deletePet);
 
 module.exports = router;

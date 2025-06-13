@@ -1,28 +1,50 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("./config/db");
+const { petDb, responsibleDb } = require("./config/db");
 const setupSwagger = require("./swagger");
 const petRoutes = require("./routes/petRoutes");
 
 const app = express();
-app.use(cors());
-app.use(express.json()); // Para manejar JSON
 
-// Configura Swagger para la documentación
+app.use(cors());
+app.use(express.json()); // Middleware to parse JSON bodies
+
+// Setup Swagger for API documentation
 setupSwagger(app);
 
-// Rutas de la API
-app.use("/api", petRoutes);  // Asegúrate de que la ruta es "/api"
+// API routes related to pets and responsibles
+app.use("/pets", petRoutes);
 
-
-// Conexión a la base de datos y sincronización
 const PORT = process.env.PORT || 3004;
-app.listen(PORT, async () => {
+
+/**
+ * Initializes and starts the Express server after
+ * verifying connections and syncing the databases.
+ */
+async function startServer() {
   try {
-    await sequelize.authenticate();
-    console.log("Database connected.");
+    // Authenticate connection with the pets database
+    await petDb.authenticate();
+    console.log("Pet Database connected.");
+
+    // Authenticate connection with the responsibles database
+    await responsibleDb.authenticate();
+    console.log("Responsible Database connected.");
+
+    // Sync pet models with the pet database
+    await petDb.sync();
+    console.log("Pet Database synchronized with models.");
+
+    // Start the Express server
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+
   } catch (err) {
-    console.error("Error connecting to the database:", err);
+    console.error("Error connecting to the databases or syncing models:");
+    console.error(err);
+    process.exit(1); // Exit process on failure
   }
-  console.log(`Server running on port ${PORT}`);
-});
+}
+
+startServer();

@@ -1,19 +1,22 @@
 const { Sequelize } = require("sequelize");
-
-// Carga las variables de entorno
 require("dotenv").config();
 
+/**
+ * Initializes a Sequelize instance for PostgreSQL connection using environment variables.
+ * SSL is enabled for secure connections, with relaxed certificate validation.
+ */
 const sequelize = new Sequelize({
-  host: process.env.DB_HOST, // DB Host
-  username: process.env.DB_USER, // DB User
-  password: process.env.DB_PASSWORD, // DB Password
-  database: process.env.DB_NAME, // DB Name
-  dialect: "postgres", // Usamos PostgreSQL
-  port: process.env.DB_PORT, // Puerto de la base de datos
-dialectOptions: {
+  host: process.env.DB_HOST,             // Database host
+  username: process.env.DB_USER,         // Database username
+  password: process.env.DB_PASSWORD,     // Database password
+  database: process.env.DB_NAME,         // Database name
+  dialect: "postgres",                   // SQL dialect
+  port: process.env.DB_PORT,             // Database port
+
+  dialectOptions: {
     ssl: {
-      require: true, 
-      rejectUnauthorized: false 
+      require: true,                     // Force SSL usage
+      rejectUnauthorized: false         // Allow self-signed certificates
     }
   }
 });

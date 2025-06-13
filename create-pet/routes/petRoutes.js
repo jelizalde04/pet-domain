@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const { createPetProfile } = require("../controllers/PetController");
-const authenticateToken = require("../middlewares/auth"); // Importa el middleware de autenticación
+const authenticateToken = require("../middlewares/auth"); 
 
 /**
  * @swagger
- * /api/pets:
+ * /pets:
  *   post:
- *     summary: Create a new pet profile
- *     description: Crea un nuevo perfil de mascota en el sistema.
+ *     summary: Crea un nuevo perfil de mascota
+ *     description: Crea un nuevo perfil de mascota en el sistema para un usuario autenticado.
  *     tags: [Pets]
  *     requestBody:
  *       required: true
@@ -53,14 +53,35 @@ const authenticateToken = require("../middlewares/auth"); // Importa el middlewa
  *                 description: Color de la mascota
  *     responses:
  *       201:
- *         description: Pet profile created successfully.
+ *         description: Perfil de mascota creado exitosamente.
  *       400:
- *         description: Invalid input data.
+ *         description: Datos de entrada no válidos.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             examples:
+ *               nombreFaltante:
+ *                 summary: Falta el nombre
+ *                 value:
+ *                   error: El nombre de la mascota es obligatorio.
+ *               mascotaDuplicada:
+ *                 summary: Mascota ya existe
+ *                 value:
+ *                   error: Ya tienes una mascota con este nombre.
+ *               responsableInvalido:
+ *                 summary: Usuario no válido
+ *                 value:
+ *                   error: ID del responsable no válido.
  *       403:
- *         description: Unauthorized action
+ *         description: Acción no autorizada (token no válido o ausente).
  *       500:
- *         description: Internal Server Error.
+ *         description: Error interno del servidor.
  */
-router.post("/pets", authenticateToken, createPetProfile); // Protegemos esta ruta con JWT
+
+router.post("/", authenticateToken, createPetProfile); 
 
 module.exports = router;
