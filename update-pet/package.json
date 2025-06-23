@@ -141,7 +141,7 @@
     "z-schema": "^5.0.5"
   },
   "scripts": {
-  "test": "jest"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
