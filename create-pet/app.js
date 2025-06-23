@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("./config/db");
+const { petDb } = require('./config/db');
 const setupSwagger = require("./swagger");
 const petRoutes = require("./routes/petRoutes");
 
@@ -16,11 +16,13 @@ const PORT = process.env.PORT || 3001;
 
 async function startServer() {
   try {
-    await sequelize.authenticate();
-    console.log("✅ Conexión a la base de datos establecida.");
+   
+    await petDb.authenticate();
+    console.log('✅ Conexión exitosa a la base de datos de mascotas.');
 
-    await sequelize.sync();
-    console.log("✅ Base de datos sincronizada con los modelos.");
+    await petDb.sync({ alter: true });  
+    console.log('🔄 Bases de datos sincronizadas.');
+ 
 
     app.listen(PORT, () => {
       console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);

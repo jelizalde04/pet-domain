@@ -1,24 +1,23 @@
 const { Sequelize } = require("sequelize");
-require("dotenv").config();
+require("dotenv").config(); // Load environment variables
 
 /**
- * Initializes a Sequelize instance for PostgreSQL connection using environment variables.
- * SSL is enabled for secure connections, with relaxed certificate validation.
+ * Sequelize instance for the PET database connection.
+ * Configured to connect to a PostgreSQL DB with SSL.
  */
-const sequelize = new Sequelize({
-  host: process.env.DB_HOST,             // Database host
-  username: process.env.DB_USER,         // Database username
-  password: process.env.DB_PASSWORD,     // Database password
-  database: process.env.DB_NAME,         // Database name
-  dialect: "postgres",                   // SQL dialect
-  port: process.env.DB_PORT,             // Database port
-
+const petDb = new Sequelize({
+  host: process.env.DB_HOST,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.PET_DB_NAME,
+  dialect: "postgres",
+  port: process.env.DB_PORT,
   dialectOptions: {
     ssl: {
-      require: true,                     // Force SSL usage
-      rejectUnauthorized: false         // Allow self-signed certificates
-    }
-  }
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
 });
 
-module.exports = sequelize;
+module.exports = { petDb };

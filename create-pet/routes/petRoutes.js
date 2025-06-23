@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { createPetProfile } = require("../controllers/PetController");
-const authenticateToken = require("../middlewares/auth"); 
+const authenticateToken = require("../middlewares/auth");
+const multer = require('multer');  
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage }).single('image'); 
 
 /**
  * @swagger
@@ -13,7 +17,7 @@ const authenticateToken = require("../middlewares/auth");
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -37,7 +41,8 @@ const authenticateToken = require("../middlewares/auth");
  *                 description: Raza de la mascota
  *               image:
  *                 type: string
- *                 description: URL de la imagen de la mascota
+ *                 format: binary
+ *                 description: Imagen de la mascota
  *               birthdate:
  *                 type: string
  *                 format: date
@@ -56,32 +61,12 @@ const authenticateToken = require("../middlewares/auth");
  *         description: Perfil de mascota creado exitosamente.
  *       400:
  *         description: Datos de entrada no válidos.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *             examples:
- *               nombreFaltante:
- *                 summary: Falta el nombre
- *                 value:
- *                   error: El nombre de la mascota es obligatorio.
- *               mascotaDuplicada:
- *                 summary: Mascota ya existe
- *                 value:
- *                   error: Ya tienes una mascota con este nombre.
- *               responsableInvalido:
- *                 summary: Usuario no válido
- *                 value:
- *                   error: ID del responsable no válido.
  *       403:
  *         description: Acción no autorizada (token no válido o ausente).
  *       500:
  *         description: Error interno del servidor.
  */
 
-router.post("/", authenticateToken, createPetProfile); 
+router.post("/", authenticateToken, upload, createPetProfile); // Agregamos el middleware de multer
 
 module.exports = router;

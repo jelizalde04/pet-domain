@@ -1,11 +1,10 @@
-const { Sequelize, DataTypes } = require("sequelize");
-const { v4: uuidv4 } = require("uuid");
-const sequelize = require("../config/db");
+const { petDb } = require("../config/db");
+const { DataTypes, Sequelize } = require("sequelize");
 
-const Pet = sequelize.define("Pet", {
+const Pet = petDb.define("Pet", {
   id: {
     type: DataTypes.UUID,
-    defaultValue: uuidv4,
+    defaultValue: Sequelize.UUIDV4,
     primaryKey: true,
   },
   name: {
@@ -18,6 +17,7 @@ const Pet = sequelize.define("Pet", {
   },
   breed: {
     type: DataTypes.STRING,
+    allowNull: true,
   },
   image: {
     type: DataTypes.STRING,
@@ -33,18 +33,24 @@ const Pet = sequelize.define("Pet", {
   },
   color: {
     type: DataTypes.STRING,
-  },
-  responsibleId: {  
+  },  
+  responsibleId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: {
-      model: "Responsibles",  
-      key: "id",
-    },
   },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+  },
+}, {
+  tableName: "Pets",
+  timestamps: true,
 });
-
-
-Pet.belongsTo(Pet, { foreignKey: "responsibleId" }); 
 
 module.exports = Pet;

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { deletePet } = require("../controllers/PetController");
-const authenticateToken = require("../middlewares/auth"); 
+const authenticateToken = require("../middlewares/auth");
 
 /**
  * @swagger
@@ -12,7 +12,7 @@ const authenticateToken = require("../middlewares/auth");
 
 /**
  * @swagger
- * /pets/{id}:
+ * /pets/delete/{id}:
  *   delete:
  *     summary: Elimina un perfil de mascota
  *     tags: [Pets]

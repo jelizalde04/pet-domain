@@ -1,4 +1,60 @@
+const axios = require('axios');
 const Pet = require("../models/Pet");
+
+
+const uploadImageToS3 = async (file, petId) => {
+  const fileName = `${petId}.jpg`;  
+  const uploadUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/pet_profile/${fileName}`;
+
+  try {
+    
+    const response = await axios.put(uploadUrl, file.buffer, {
+      headers: { 'Content-Type': file.mimetype },  
+    });
+
+   
+    if (response.status === 200) {
+      const imageUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/pet_profile/${fileName}`;
+      return imageUrl;  
+    } else {
+      throw new Error('Error al subir la imagen a S3');
+    }
+  } catch (error) {
+    console.error('Error al subir la imagen a S3:', error);
+    throw new Error('Error al subir la imagen a S3');
+  }
+};
+
+
+const deletePetImageFromS3 = async (imageUrl) => {
+  try {
+    const fileName = imageUrl.split('/').pop(); 
+    const deleteUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/pet_profile/${fileName}`;
+
+    
+    const response = await axios.delete(deleteUrl);
+
+    if (response.status === 204) {
+      console.log('Imagen eliminada correctamente de S3');
+    } else {
+      throw new Error('Error al eliminar la imagen de S3');
+    }
+  } catch (error) {
+    console.error('Error al eliminar la imagen de S3:', error);
+    throw new Error('Error al eliminar la imagen de S3');
+  }
+};
+
+
+const updatePetImageInDatabase = async (petId, imageUrl) => {
+  try {
+    await Pet.update({ image: imageUrl }, { where: { id: petId } });
+  } catch (error) {
+    console.error('Error al actualizar la imagen en la base de datos:', error);
+    throw new Error('Error al actualizar la imagen en la base de datos');
+  }
+};
+
 
 const updatePetProfile = async (id, updateData, authenticatedUserId) => {
   const { name } = updateData;
@@ -44,7 +100,7 @@ const updatePetProfile = async (id, updateData, authenticatedUserId) => {
     }
   }
 
-  const allowedFields = ["name", "species", "breed", "image", "birthdate"];
+  const allowedFields = ["name", "species", "breed", "birthdate"];
   const fieldsToUpdate = allowedFields.filter(field => updateData.hasOwnProperty(field));
 
   if (fieldsToUpdate.length === 0) {
@@ -62,4 +118,4 @@ const updatePetProfile = async (id, updateData, authenticatedUserId) => {
   return pet;
 };
 
-module.exports = { updatePetProfile };
+module.exports = { uploadImageToS3, deletePetImageFromS3, updatePetImageInDatabase, updatePetProfile };

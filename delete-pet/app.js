@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("./config/db");
+const { petDb } = require('./config/db');
 const setupSwagger = require("./swagger");
 const petRoutes = require("./routes/petRoutes");
 
@@ -16,7 +16,7 @@ app.use(express.json()); // Middleware to parse incoming JSON requests
 setupSwagger(app);
 
 // API routes for pets
-app.use("/pets", petRoutes);
+app.use("/pets/delete/", petRoutes);
 
 const PORT = process.env.PORT || 3005;
 
@@ -26,19 +26,22 @@ const PORT = process.env.PORT || 3005;
  */
 async function startServer() {
   try {
-    await sequelize.authenticate();
-    console.log("✅ Base de datos conectada.");
+    // Conexión a base de datos de mascotas
+    await petDb.authenticate();
+    console.log('✅ Conexión exitosa a la base de datos de mascotas.');
 
-    await sequelize.sync();
-    console.log("✅ Base de datos sincronizada con los modelos.");
+    // Sincronización de modelos 
+    await petDb.sync({ alter: true });  
+    console.log('🔄 Bases de datos sincronizadas.');
+ 
 
     app.listen(PORT, () => {
-      console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+      console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
     });
 
   } catch (err) {
-    console.error("❌ Error conectando o sincronizando la base de datos:", err.message);
-    process.exit(1); // Exit process on failure
+    console.error("❌ Error al conectar o sincronizar la base de datos:", err.message);
+    process.exit(1);
   }
 }
 
