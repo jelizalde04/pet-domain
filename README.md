@@ -1,1 +1,1 @@
-update-domain
+pet-domain
