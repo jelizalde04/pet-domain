@@ -1,165 +1,412 @@
-
 name: Docker Build and Deploy Pet Domain
 
-# Specify the events that will trigger this workflow. In this case, the workflow will run
-# when a push is made to the "test" branch.
 on:
   push:
     branches:
       - test
 
-# Define the jobs that will be executed as part of this workflow.
 jobs:
-  build_and_deploy:
-    # This job will run on the latest version of Ubuntu.
+  # Job para Build create-pet
+  build_docker_create_pet:
     runs-on: ubuntu-latest
-
-    # Define the steps within this job. Each step represents a task to be executed sequentially.
     steps:
-    
-    # Step 1: Checkout the code from the repository to the runner's workspace.
-    - name: Check out code
-      # This action checks out the repository's code so that it can be accessed and used in subsequent steps.
-      uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
 
-    # Step 2: Log in to Docker Hub to enable pushing Docker images.
-    - name: Log in to Docker Hub
-      # This step logs into Docker Hub using the credentials stored as GitHub secrets.
-      run: |
-        echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-    # Step 3: Install Docker Compose to manage multi-container Docker applications.
-    - name: Install Docker Compose
-      # This step installs Docker Compose on the runner to facilitate the management of containers.
-      run: |
+      - name: Install dependencies and run tests for create-pet
+        run: |
+          cd create-pet
+          npm install
+          npm test
 
-        sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
-        docker-compose --version
+      - name: Build Docker image for create-pet
+        run: |
+          docker build -t joeli2104/create-pet:latest ./create-pet
 
-    # Step 4: Install dependencies and run tests for all microservices.
-    - name: Install dependencies and run tests for all microservices
-      # In this step, dependencies are installed for each microservice, and the corresponding tests are executed.
-      run: |
-        
-        cd create-pet
-        npm install
-        npm test
+  # Job para Push create-pet
+  push_dockerhub_create_pet:
+    runs-on: ubuntu-latest
+    needs: build_docker_create_pet
+    steps:
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-        cd ../update-pet
-        npm install
-        npm test
+      - name: Push Docker image for create-pet
+        run: |
+          docker push joeli2104/create-pet:latest
 
-        cd ../get-pet-by-id
-        npm install
-        npm test
-        
-        cd ../get-all-pets
-        npm install
-        npm test
+  # Job para Deploy create-pet a EC2
+  deploy_ec2_create_pet:
+    runs-on: ubuntu-latest
+    needs: push_dockerhub_create_pet
+    steps:
+      - name: Deploy create-pet to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_PET_TEST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            export AWS_REGION=${{ secrets.AWS_REGION }}
+            export DB_HOST=${{ secrets.DB_HOST }}
+            export DB_USER=${{ secrets.DB_USER }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DB_NAME=${{ secrets.DB_NAME }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            export RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}
+            export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+            export DB_PORT=${{ secrets.DB_PORT }}
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            export DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
 
-        cd ../delete-pet
-        npm install
-        npm test
+            # Stop any existing container and remove it
+            docker stop create-pet || true
+            docker rm create-pet || true
 
-    # Step 5: Build Docker images using Docker Compose.
-    - name: Build Docker images using Docker Compose
-      # This step builds the Docker images for all microservices defined in the docker-compose file.
-      run: |
-        docker-compose -f docker-compose-pet-domain.yml build
+            # Run the container with the environment variables
+            docker run -d --name create-pet \
+              -p 3001:3001 \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_USER=${{ secrets.DB_USER }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+              -e AWS_REGION=${{ secrets.AWS_REGION }} \
+              -e PET_DB_NAME=${{ secrets.PET_DB_NAME }} \
+              -e RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }} \
+              -e DB_PORT=${{ secrets.DB_PORT }} \
+              -e DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
+              -e DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }} \
+              joeli2104/create-pet:latest
 
-    # Step 6: Push Docker images to Docker Hub.
-    - name: Push Docker images to Docker Hub
-      # After building the images, this step pushes them to Docker Hub for distribution and deployment.
-      run: |
-        docker-compose -f docker-compose-pet-domain.yml push
+  # Job para Build update-pet
+  build_docker_update_pet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
 
-    # Step 7: Clean up existing Docker containers on the EC2 instance.
-    - name: Clean up existing containers on EC2
-      # This step uses SSH to connect to the EC2 instance and removes any existing containers to ensure a clean environment for the new containers.
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        # Retrieve EC2 instance connection details securely from GitHub secrets
-        host: ${{ secrets.EC2_PET_TEST }}
-        username: ubuntu
-        key: ${{ secrets.EC2_SSH_KEY }}
-        port: 22
-        debug: true  # Enable debug mode for additional output during execution
-        script: |
-       
-          docker stop $(docker ps -aq) || true
-          docker rm $(docker ps -aq) || true
-          docker system prune -af || true
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-    # Step 8: Deploy the newly built containers to EC2 via SSH.
-    - name: Deploy new containers to EC2 via SSH
-      # This step SSHs into the EC2 instance and deploys the new containers by pulling the latest images from Docker Hub.
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        host: ${{ secrets.EC2_PET_TEST }}
-        username: ubuntu
-        key: ${{ secrets.EC2_SSH_KEY }}
-        port: 22
-        debug: true  # Enable debugging to observe detailed logs during execution
-        script: |
-          export AWS_REGION=${{ secrets.AWS_REGION }}
-          export DB_HOST=${{ secrets.DB_HOST }}
-          export DB_USER=${{ secrets.DB_USER }}
-          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          export DB_NAME=${{ secrets.DB_NAME }}
-          export JWT_SECRET=${{ secrets.JWT_SECRET }}
-          export PET_DB_NAME=${{ secrets.PET_DB_NAME }}
-          export RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}
-          export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
-          
-        
-          docker run -d --name create-pet \
-            -p 3001:3001 \
-            -e DB_HOST=${{ secrets.DB_HOST }} \
-            -e DB_USER=${{ secrets.DB_USER }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -e DB_NAME=${{ secrets.DB_NAME }} \
-            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-            joeli2104/create-pet:latest
+      - name: Install dependencies and run tests for update-pet
+        run: |
+          cd update-pet
+          npm install
+          npm test
 
-          docker run -d --name update-pet \
-            -p 3002:3002 \
-            -e DB_HOST=${{ secrets.DB_HOST }} \
-            -e DB_USER=${{ secrets.DB_USER }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -e DB_NAME=${{ secrets.DB_NAME }} \
-            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-            joeli2104/update-pet:latest
+      - name: Build Docker image for update-pet
+        run: |
+          docker build -t joeli2104/update-pet:latest ./update-pet
 
+  # Job para Push update-pet
+  push_dockerhub_update_pet:
+    runs-on: ubuntu-latest
+    needs: build_docker_update_pet
+    steps:
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-          docker run -d --name get-pet-by-id \
-            -p 3003:3003 \
-            -e DB_HOST=${{ secrets.DB_HOST }} \
-            -e DB_USER=${{ secrets.DB_USER }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -e DB_NAME=${{ secrets.DB_NAME }} \
-            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-            joeli2104/get-pet-by-id:latest
+      - name: Push Docker image for update-pet
+        run: |
+          docker push joeli2104/update-pet:latest
 
-          docker run -d --name get-all-pets \
-            -p 3004:3004 \
-            -e DB_HOST=${{ secrets.DB_HOST }} \
-            -e DB_USER=${{ secrets.DB_USER }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -e DB_NAME=${{ secrets.DB_NAME }} \
-            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-            joeli2104/get-all-pets:latest
+  # Job para Deploy update-pet a EC2
+  deploy_ec2_update_pet:
+    runs-on: ubuntu-latest
+    needs: push_dockerhub_update_pet
+    steps:
+      - name: Deploy update-pet to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_PET_TEST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            export AWS_REGION=${{ secrets.AWS_REGION }}
+            export DB_HOST=${{ secrets.DB_HOST }}
+            export DB_USER=${{ secrets.DB_USER }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DB_NAME=${{ secrets.DB_NAME }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            export RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}
+            export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+            export DB_PORT=${{ secrets.DB_PORT }}
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            export DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
 
-          docker run -d --name delete-pet \
-            -p 3005:3005 \
-            -e DB_HOST=${{ secrets.DB_HOST }} \
-            -e DB_USER=${{ secrets.DB_USER }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -e DB_NAME=${{ secrets.DB_NAME }} \
-            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-            joeli2104/delete-pet:latest
+            # Stop any existing container and remove it
+            docker stop update-pet || true
+            docker rm update-pet || true
+
+            # Run the container with the environment variables
+            docker run -d --name update-pet \
+              -p 3002:3002 \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_USER=${{ secrets.DB_USER }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+              -e AWS_REGION=${{ secrets.AWS_REGION }} \
+              -e PET_DB_NAME=${{ secrets.PET_DB_NAME }} \
+              -e RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }} \
+              -e DB_PORT=${{ secrets.DB_PORT }} \
+              -e DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
+              -e DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }} \
+              joeli2104/update-pet:latest
+
+  # Job para Build get-pet-by-id
+  build_docker_get_pet_by_id:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Install dependencies and run tests for get-pet-by-id
+        run: |
+          cd get-pet-by-id
+          npm install
+          npm test
+
+      - name: Build Docker image for get-pet-by-id
+        run: |
+          docker build -t joeli2104/get-pet-by-id:latest ./get-pet-by-id
+
+  # Job para Push get-pet-by-id
+  push_dockerhub_get_pet_by_id:
+    runs-on: ubuntu-latest
+    needs: build_docker_get_pet_by_id
+    steps:
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Push Docker image for get-pet-by-id
+        run: |
+          docker push joeli2104/get-pet-by-id:latest
+
+  # Job para Deploy get-pet-by-id a EC2
+  deploy_ec2_get_pet_by_id:
+    runs-on: ubuntu-latest
+    needs: push_dockerhub_get_pet_by_id
+    steps:
+      - name: Deploy get-pet-by-id to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_PET_TEST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            export AWS_REGION=${{ secrets.AWS_REGION }}
+            export DB_HOST=${{ secrets.DB_HOST }}
+            export DB_USER=${{ secrets.DB_USER }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DB_NAME=${{ secrets.DB_NAME }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            export RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}
+            export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+            export DB_PORT=${{ secrets.DB_PORT }}
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            export DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
+
+            # Stop any existing container and remove it
+            docker stop get-pet-by-id || true
+            docker rm get-pet-by-id || true
+
+            # Run the container with the environment variables
+            docker run -d --name get-pet-by-id \
+              -p 3003:3003 \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_USER=${{ secrets.DB_USER }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+              -e AWS_REGION=${{ secrets.AWS_REGION }} \
+              -e PET_DB_NAME=${{ secrets.PET_DB_NAME }} \
+              -e RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }} \
+              -e DB_PORT=${{ secrets.DB_PORT }} \
+              -e DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
+              -e DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }} \
+              joeli2104/get-pet-by-id:latest
+
+    # Job para Build get-all-pets
+  build_docker_get_all_pets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Install dependencies and run tests for get-all-pets
+        run: |
+          cd get-all-pets
+          npm install
+          npm test
+
+      - name: Build Docker image for get-all-pets
+        run: |
+          docker build -t joeli2104/get-all-pets:latest ./get-all-pets
+
+  # Job para Push get-all-pets
+  push_dockerhub_get_all_pets:
+    runs-on: ubuntu-latest
+    needs: build_docker_get_all_pets
+    steps:
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Push Docker image for get-all-pets
+        run: |
+          docker push joeli2104/get-all-pets:latest
+
+  # Job para Deploy get-all-pets a EC2
+  deploy_ec2_get_all_pets:
+    runs-on: ubuntu-latest
+    needs: push_dockerhub_get_all_pets
+    steps:
+      - name: Deploy get-all-pets to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_PET_TEST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            export AWS_REGION=${{ secrets.AWS_REGION }}
+            export DB_HOST=${{ secrets.DB_HOST }}
+            export DB_USER=${{ secrets.DB_USER }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DB_NAME=${{ secrets.DB_NAME }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            export RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}
+            export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+            export DB_PORT=${{ secrets.DB_PORT }}
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            export DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
+
+            # Stop any existing container and remove it
+            docker stop get-all-pets || true
+            docker rm get-all-pets || true
+
+            # Run the container with the environment variables
+            docker run -d --name get-all-pets \
+              -p 3004:3004 \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_USER=${{ secrets.DB_USER }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+              -e AWS_REGION=${{ secrets.AWS_REGION }} \
+              -e PET_DB_NAME=${{ secrets.PET_DB_NAME }} \
+              -e RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }} \
+              -e DB_PORT=${{ secrets.DB_PORT }} \
+              -e DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
+              -e DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }} \
+              joeli2104/get-all-pets:latest
+
+  # Job para Build delete-pet
+  build_docker_delete_pet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Install dependencies and run tests for delete-pet
+        run: |
+          cd delete-pet
+          npm install
+          npm test
+
+      - name: Build Docker image for delete-pet
+        run: |
+          docker build -t joeli2104/delete-pet:latest ./delete-pet
+
+  # Job para Push delete-pet
+  push_dockerhub_delete_pet:
+    runs-on: ubuntu-latest
+    needs: build_docker_delete_pet
+    steps:
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Push Docker image for delete-pet
+        run: |
+          docker push joeli2104/delete-pet:latest
+
+  # Job para Deploy delete-pet a EC2
+  deploy_ec2_delete_pet:
+    runs-on: ubuntu-latest
+    needs: push_dockerhub_delete_pet
+    steps:
+      - name: Deploy delete-pet to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_PET_TEST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            export AWS_REGION=${{ secrets.AWS_REGION }}
+            export DB_HOST=${{ secrets.DB_HOST }}
+            export DB_USER=${{ secrets.DB_USER }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DB_NAME=${{ secrets.DB_NAME }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            export RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}
+            export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+            export DB_PORT=${{ secrets.DB_PORT }}
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            export DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
+
+            # Stop any existing container and remove it
+            docker stop delete-pet || true
+            docker rm delete-pet || true
+
+            # Run the container with the environment variables
+            docker run -d --name delete-pet \
+              -p 3005:3005 \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_USER=${{ secrets.DB_USER }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+              -e AWS_REGION=${{ secrets.AWS_REGION }} \
+              -e PET_DB_NAME=${{ secrets.PET_DB_NAME }} \
+              -e RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }} \
+              -e DB_PORT=${{ secrets.DB_PORT }} \
+              -e DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
+              -e DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }} \
+              joeli2104/delete-pet:latest 
