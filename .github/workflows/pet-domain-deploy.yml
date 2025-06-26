@@ -17,6 +17,16 @@ jobs:
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
+      - name: Export environment variables for test
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "PET_DB_NAME=${{ secrets.PET_DB_NAME }}" >> $GITHUB_ENV
+          echo "RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}" >> $GITHUB_ENV
+
       - name: Install dependencies and run tests for create-pet
         run: |
           cd create-pet
@@ -82,6 +92,16 @@ jobs:
       - name: Log in to Docker Hub
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Export environment variables for test
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "PET_DB_NAME=${{ secrets.PET_DB_NAME }}" >> $GITHUB_ENV
+          echo "RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}" >> $GITHUB_ENV
 
       - name: Install dependencies and run tests for update-pet
         run: |
@@ -149,6 +169,16 @@ jobs:
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
+      - name: Export environment variables for test
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "PET_DB_NAME=${{ secrets.PET_DB_NAME }}" >> $GITHUB_ENV
+          echo "RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}" >> $GITHUB_ENV
+
       - name: Install dependencies and run tests for get-pet-by-id
         run: |
           cd get-pet-by-id
@@ -215,6 +245,16 @@ jobs:
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
+      - name: Export environment variables for test
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "PET_DB_NAME=${{ secrets.PET_DB_NAME }}" >> $GITHUB_ENV
+          echo "RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}" >> $GITHUB_ENV
+
       - name: Install dependencies and run tests for get-all-pets
         run: |
           cd get-all-pets
@@ -280,6 +320,16 @@ jobs:
       - name: Log in to Docker Hub
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Export environment variables for test
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "PET_DB_NAME=${{ secrets.PET_DB_NAME }}" >> $GITHUB_ENV
+          echo "RESPONSIBLE_DB_NAME=${{ secrets.RESPONSIBLE_DB_NAME }}" >> $GITHUB_ENV
 
       - name: Install dependencies and run tests for delete-pet
         run: |
