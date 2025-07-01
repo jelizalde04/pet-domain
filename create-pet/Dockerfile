@@ -1,31 +1,26 @@
-# Stage 1: Build the app
-FROM node:16 AS build
-
-WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the source code
-COPY . .
-
-# Run build script to generate dist/
-RUN npm run build
-
-# Stage 2: Production image
+# Usa una imagen oficial de Node.js ligera
 FROM node:16-alpine
 
+# Establece el directorio de trabajo
 WORKDIR /app
 
-# Copy only built files and dependencies from build stage
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules ./node_modules
+# Copia los archivos de dependencias primero para cachear npm install
+COPY package*.json ./
 
-# Expose the port your app listens on
+# Instala las dependencias
+RUN npm install
+
+# Copia el resto de los archivos del proyecto
+COPY . .
+
+# Ejecuta el build que limpia dist, hace bundle y copia archivos/carpetas
+RUN npm run build
+
+# Copia el archivo .env si es necesario en producción
+COPY .env .
+
+# Expone el puerto donde corre tu app
 EXPOSE 3001
 
-# Run the app
+# Comando para correr la app empaquetada
 CMD ["node", "dist/app.js"]

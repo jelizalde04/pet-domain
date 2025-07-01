@@ -5,7 +5,11 @@
   "scripts": {
     "start": "node app.js",
     "test": "jest",
-    "build": "esbuild app.js --bundle --platform=node --outfile=dist/app.js"
+    "clean": "rm -rf dist",
+    "bundle": "esbuild app.js --bundle --platform=node --outfile=dist/app.js",
+    "copy-files": "cp swagger.js dist/ && cp -r config dist/ && cp -r controllers dist/ && cp -r services dist/ && cp -r middlewares dist/ && cp -r models dist/ && cp -r routes dist/",
+    "build": "npm run clean && npm run bundle && npm run copy-files"
+
   },
   "dependencies": {
     "axios": "^1.10.0",
