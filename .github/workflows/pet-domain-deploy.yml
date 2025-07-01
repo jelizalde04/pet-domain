@@ -241,6 +241,7 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/update-pet:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/update-pet:latest
             docker stop update-pet || true && docker rm update-pet || true
             docker run -d --name update-pet \
@@ -277,6 +278,7 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/update-pet:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/update-pet:latest
             docker stop update-pet || true && docker rm update-pet || true
             docker run -d --name update-pet \
@@ -357,6 +359,7 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/get-pet-by-id:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/get-pet-by-id:latest
             docker stop get-pet-by-id || true && docker rm get-pet-by-id || true
             docker run -d --name get-pet-by-id \
@@ -393,6 +396,7 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/get-pet-by-id:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/get-pet-by-id:latest
             docker stop get-pet-by-id || true && docker rm get-pet-by-id || true
             docker run -d --name get-pet-by-id \
@@ -473,6 +477,7 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/get-all-pets:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/get-all-pets:latest
             docker stop get-all-pets || true && docker rm get-all-pets || true
             docker run -d --name get-all-pets \
@@ -509,6 +514,7 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/get-all-pets:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/get-all-pets:latest
             docker stop get-all-pets || true && docker rm get-all-pets || true
             docker run -d --name get-all-pets \
@@ -589,6 +595,7 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/delete-pet:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/delete-pet:latest
             docker stop delete-pet || true && docker rm delete-pet || true
             docker run -d --name delete-pet \
@@ -625,6 +632,7 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/delete-pet:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/delete-pet:latest
             docker stop delete-pet || true && docker rm delete-pet || true
             docker run -d --name delete-pet \

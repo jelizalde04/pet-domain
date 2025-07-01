@@ -1,17 +1,20 @@
-# Use an official Node.js runtime as the base image
 FROM node:16
 
-# Create and set the working directory
 WORKDIR /app
 
-# Copy the project files into the Docker image
-COPY . .
+COPY package*.json ./
 
-# Install project dependencies
-RUN npm install
+RUN npm install --production
 
-# Expose the port the app will run on
+COPY app.js .
+COPY swagger.js .
+COPY config ./config
+COPY controllers ./controllers
+COPY services ./services
+COPY middlewares ./middlewares
+COPY models ./models
+COPY routes ./routes
+
 EXPOSE 3003
 
-# Command to run the app
 CMD ["node", "app.js"]
