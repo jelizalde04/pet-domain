@@ -123,6 +123,7 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest
             docker stop create-pet || true && docker rm create-pet || true
             docker run -d --name create-pet \
@@ -159,12 +160,14 @@ jobs:
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest
             docker stop create-pet || true && docker rm create-pet || true
             docker run -d --name create-pet \
               --env-file /home/ubuntu/create-pet.env \
               -p 3001:3001 \
               ${{ secrets.DOCKERHUB_USERNAME }}/create-pet:latest
+
 
   # -------------------- UPDATE-PET --------------------
   test_update_pet:
