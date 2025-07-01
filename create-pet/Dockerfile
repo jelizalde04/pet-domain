@@ -1,17 +1,26 @@
-# Use an official Node.js runtime as the base image
-FROM node:16
+# Etapa build optimizada
+FROM node:16 AS build
 
-# Create and set the working directory
 WORKDIR /app
 
-# Copy the project files into the Docker image
-COPY . .
+# Copia solo los archivos de dependencias primero
+COPY package*.json ./
 
-# Install project dependencies
 RUN npm install
 
-# Expose the port the app will run on
+# Copiar el resto solo si hubo cambios
+COPY . .
+
+RUN npm run build
+
+# Etapa producción
+FROM node:16 AS production
+
+WORKDIR /app
+
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist6
+
 EXPOSE 3001
 
-# Command to run the app
-CMD ["node", "app.js"]
+CMD ["node", "dist/app.js"]
