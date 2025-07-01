@@ -16,9 +16,6 @@ COPY . .
 # Ejecuta el build que limpia dist, hace bundle y copia archivos/carpetas
 RUN npm run build
 
-# Copia el archivo .env si es necesario en producción
-COPY .env .
-
 # Expone el puerto donde corre tu app
 EXPOSE 3001
 
