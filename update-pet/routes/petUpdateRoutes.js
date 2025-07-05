@@ -56,40 +56,40 @@ router.patch("/:id", authenticateToken, updatePet);
 
 /**
  * @swagger
- * /pets/{id}/image:
- *   put:
- *     summary: Actualizar la imagen de una mascota
- *     tags: [Pets]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *         description: ID de la mascota a actualizar
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               image:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Imagen de la mascota actualizada exitosamente
- *       403:
- *         description: No tienes permiso para actualizar la imagen de esta mascota
- *       404:
- *         description: Mascota no encontrada
- *       500:
- *         description: Error al actualizar la imagen
+ /pets/update/image/{id}:
+  put:
+    summary: Actualizar la imagen de una mascota
+    tags: [Pets]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: ID de la mascota a actualizar
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              image:
+                type: string
+                format: binary
+    responses:
+      200:
+        description: Imagen de la mascota actualizada exitosamente
+      403:
+        description: No tienes permiso para actualizar la imagen de esta mascota
+      404:
+        description: Mascota no encontrada
+      500:
+        description: Error al actualizar la imagen
  */
-router.put("/:id/image", authenticateToken, upload, updatePetImage); // Ruta para actualizar solo la imagen de la mascota
+router.put("/image/:id", authenticateToken, upload, updatePetImage); // Ruta para actualizar solo la imagen de la mascota
 
 module.exports = router;

@@ -12,7 +12,10 @@ app.use(express.json()); // Middleware to parse JSON request bodies
 setupSwagger(app);
 
 // API routes for pets and their responsible users
-app.use("/pets", petRoutes);
+app.use("/pets/getId", petRoutes);
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Service is healthy' });
+});
 
 const PORT = process.env.PORT || 3003;
 

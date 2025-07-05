@@ -13,6 +13,10 @@ setupSwagger(app);
 
 app.use("/pets/update", petUpdateRoutes);
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Service is healthy' });
+});
+
 const PORT = process.env.PORT || 3002;
 
 async function startServer() {

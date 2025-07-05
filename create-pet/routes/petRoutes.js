@@ -9,11 +9,13 @@ const upload = multer({ storage: storage }).single('image');
 
 /**
  * @swagger
- * /pets:
+ * /pets/create:
  *   post:
  *     summary: Crea un nuevo perfil de mascota
  *     description: Crea un nuevo perfil de mascota en el sistema para un usuario autenticado.
  *     tags: [Pets]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -67,6 +69,6 @@ const upload = multer({ storage: storage }).single('image');
  *         description: Error interno del servidor.
  */
 
-router.post("/", authenticateToken, upload, createPetProfile); // Agregamos el middleware de multer
+router.post("/", authenticateToken, upload, createPetProfile);
 
 module.exports = router;

@@ -5,7 +5,7 @@ const authenticateToken = require("../middlewares/auth");
 
 /**
  * @swagger
- * /pets:
+ * /pets/getAll:
  *   get:
  *     summary: Obtener todas las mascotas del usuario autenticado, incluyendo información del responsable
  *     tags: [Pets]

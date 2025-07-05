@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { getPetById } = require("../controllers/PetGetController");
-const authenticateToken = require("../middlewares/auth"); 
+const authenticateToken = require("../middlewares/auth");
 
 /**
  * @swagger
@@ -12,7 +12,7 @@ const authenticateToken = require("../middlewares/auth");
 
 /**
  * @swagger
- * /pets/{id}:
+ * /pets/getId/{id}:
  *   get:
  *     summary: Obtiene una mascota por su ID
  *     tags: [Consulta de Mascotas]
