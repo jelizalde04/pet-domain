@@ -17,17 +17,16 @@ const swaggerOptions = {
           bearerFormat: "JWT",
         },
       },
-      },
-    security: [{ bearerAuth: [] }],
     },
-  
-  apis: ["./routes/petRoutes.js"], 
+    security: [], // No obligamos globalmente
+  },
+  apis: ["./routes/petRoutes.js"],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 const setupSwagger = (app) => {
-  app.use("/api-docs-getAllPets", swaggerUi.serve, swaggerUi.setup(swaggerDocs)); 
+  app.use("/api-docs-getAllPets", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 };
 
 module.exports = setupSwagger;
