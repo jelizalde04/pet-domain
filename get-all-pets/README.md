@@ -15,7 +15,7 @@ This microservice queries the database to obtain the user's pets and their detai
 
 ## 2. Routes and Endpoints
 
-### 1. Get All Pets for a User
+### 1. Get All Pets for a User 
 
 - **Method:** `GET`
 - **Route:** `/pets`

@@ -10,7 +10,7 @@ The `update-pet` microservice allows updating pet profiles and their associated 
 - Update the pet's associated image.
 - Ensure only the pet's owner can perform updates.
 
-### Interaction with Other Microservices
+### Interaction with Other Microservices 
 
 This microservice communicates with AWS S3 to store images and with the database to update pet records.
 

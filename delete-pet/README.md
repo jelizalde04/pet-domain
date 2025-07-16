@@ -12,7 +12,7 @@ El microservicio `delete-pet` permite la eliminación de un perfil de mascota a 
 ### Interacción con otros microservicios:
 Este microservicio no interactúa directamente con otros microservicios, pero realiza una solicitud para eliminar la imagen de la mascota en AWS S3 y elimina el registro de la mascota en la base de datos.
 
-## 2. Rutas y Endpoints
+## 2. Rutas y Endpoints 
 
 ### **1. Eliminar una Mascota por ID**
 - **Método:** `DELETE`

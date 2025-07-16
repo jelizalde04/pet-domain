@@ -10,15 +10,15 @@ The `get-pet-by-id` microservice allows users to retrieve pet details by their I
 - Ensure only the pet's owner can access the information.
 - Include both pet and owner data in the response.
 
-### Interaction with Other Microservices
+### Interaction with Other Microservices 
 
 This microservice does not directly interact with other microservices, but it queries the database to obtain pet and owner details.
 
 ## 2. Routes and Endpoints
-
+ 
 ### 1. Get Pet Information by ID
 
-- **Method:** `GET`
+- **Method:** `GET` 
 - **Route:** `/pets/{id}`
 - **Description:** Retrieves complete information about a pet, including the owner's details, using the pet's ID.
 

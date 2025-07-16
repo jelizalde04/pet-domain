@@ -1,6 +1,6 @@
 # Create-Pet Microservice
 
-## 1. Service Overview  
+## 1. Service Overview   
 
 The `create-pet` microservice allows authenticated users to create pet profiles. Owners (users) can create a profile for their pets by providing data such as name, species, breed, birthdate, color, etc. An image of the pet can also be uploaded and stored in a cloud storage service like AWS S3.
 
