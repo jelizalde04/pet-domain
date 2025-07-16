@@ -1,7 +1,7 @@
 # Get-All-Pets Microservice
 
 ## 1. Service Overview
-
+  
 The `get-all-pets` microservice allows authenticated users to retrieve all pets associated with their account. This microservice ensures that only the responsible user can access the list of their pets and returns details for each pet.
 
 ### Purpose

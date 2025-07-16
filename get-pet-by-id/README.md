@@ -4,7 +4,7 @@
 
 The `get-pet-by-id` microservice allows users to retrieve pet details by their ID, as long as the authenticated user is the pet's owner. This microservice ensures that only the responsible user can access their pet's information. The returned data includes both the pet's details and the owner's information.
 
-### Purpose
+### Purpose   
 
 - Retrieve pet details by ID.
 - Ensure only the pet's owner can access the information.

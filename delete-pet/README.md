@@ -1,6 +1,6 @@
 # Microservicio Delete-Pet
 
-## 1. Resumen del Microservicio
+## 1. Resumen del Microservicio  
 
 El microservicio `delete-pet` permite la eliminación de un perfil de mascota a partir de su ID. El usuario debe estar autenticado mediante un token JWT y debe ser el responsable de la mascota para poder eliminarla. Además, si la mascota tiene una imagen asociada, esta también se elimina de AWS S3 antes de borrar el registro de la mascota en la base de datos.
 

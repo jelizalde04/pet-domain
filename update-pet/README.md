@@ -1,6 +1,6 @@
 # Update-Pet Microservice
 
-## 1. Service Overview
+## 1. Service Overview     
 
 The `update-pet` microservice allows updating pet profiles and their associated images. Owners (authenticated users) can update their pets' data, such as name, species, breed, birthdate, etc. They can also update the pet's image, which is uploaded to a cloud storage service like AWS S3.
 
