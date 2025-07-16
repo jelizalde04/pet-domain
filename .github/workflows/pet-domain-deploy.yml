@@ -1,4 +1,4 @@
-name: CI/CD Pet Domain Microservices (split jobs)
+name: CI/CD Pet Domain Microservices  
 
 on:
   push:

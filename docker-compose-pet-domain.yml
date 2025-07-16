@@ -1,6 +1,6 @@
 version: '3.8'
 
-services:
+services:  
   create-pet:
     build:
       context: ./create-pet
